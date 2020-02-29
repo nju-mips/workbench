@@ -1,41 +1,41 @@
-# note INPUT=REF is designed for microbench
-# arg1 dir
-# arg2 name eg. videotest microbench
-# arg3 objdir default: obj/name
-# arg4 env
-define test_template
-$(2)_APP := $(1)/build/$(2)
-ifneq ($(3),)
-$(2)_OBJDIR := $(3)
-else
-$(2)_OBJDIR := $(OBJ_DIR)/$(2)
-endif
-$(2)_DEPS != find $(1) -regex ".*.\(c\|h\|cc\|cpp\|S\)"
+include rules/test-template.mk
 
-.PHONY: compile-$(2) run-$(2) run-nemu-$(2) clean-$(2)
+INPUT ?= REF # for microbench, another mode is TEST
 
-$$($(2)_APP)-$(ARCH).%: $$($(2)_DEPS)
-	@make -s -C $(1) ARCH=$(ARCH) $(4)
+AM_TESTS := $(filter-out cputests,$(shell ls $(AM_HOME)/tests))
+AM_APPS != ls $(AM_HOME)/apps
 
-compile-$(2): $$($(2)_APP)-$(ARCH).elf \
-			  $$($(2)_APP)-$(ARCH).bin \
-			  $$($(2)_APP)-$(ARCH).txt
-	@mkdir -p $$($(2)_OBJDIR)
-	@cd $$($(2)_OBJDIR) && \
-		ln -sf $$^ . && \
-		rename -f 's/txt$$$$/S/g' *.txt && \
-		rename -f 's/-$(ARCH)//g' * \
+# AM apps
+$(foreach app,$(AM_APPS),$(eval $(call test_template,$(AM_HOME)/apps/$(app),$(app),)))
 
-run-$(2): $(EMU_BIN) compile-$(2)
-	@cd $$($(2)_OBJDIR) && \
-	  ln -sf $(abspath $(EMU_BIN)) emulator && \
-	  ./emulator -e ./$(2).elf 2> npc.out
+# AM tests
+$(foreach app,$(AM_TESTS),$(eval $(call test_template,$(AM_HOME)/tests/$(app),$(app),)))
 
-run-nemu-$(2): $(MIPS32_NEMU) compile-$(2)
-	@cd $$($(2)_OBJDIR) && \
-	  ln -sf $(MIPS32_NEMU) nemu && \
-	  ./nemu -b -e ./$(2).elf
+# insttest
+$(eval $(call test_template,$(INSTTEST_HOME),insttest,))
 
-clean-$(2):
-	@make -s -C $(1) ARCH=$(ARCH) clean
-endef
+# tlbtest
+$(eval $(call test_template,$(TLBTEST_HOME),tlbtest,))
+
+# nanos
+$(eval $(call test_template,$(NANOS_HOME),nanos,))
+
+# cputests
+.PHONY: clean-cputests compile-cputests run-cputests run-nemu-cputests
+
+clean-cputests:
+	@make -s -C $(AM_HOME)/tests/cputest clean
+
+CPUTESTS := $(basename $(notdir $(shell find $(AM_HOME)/tests/cputest -name "*.c")))
+
+compile-cputests: $(addprefix compile-,$(CPUTESTS))
+run-cputests: $(addprefix run-,$(CPUTESTS))
+run-nemu-cputests: $(addprefix run-nemu-,$(CPUTESTS))
+
+$(foreach c,$(CPUTESTS),$(eval $(call test_template,$(AM_HOME)/tests/cputest,$(c),$(OBJ_DIR)/cputests/$(c),ALL=$(c))))
+
+.PHONY: run-tests run-nemu-tests clean-tests
+
+run-tests: run-cputests run-microbench run-insttest
+run-nemu-tests: run-nemu-cputests run-nemu-microbench run-nemu-insttest
+clean-tests: clean-cputests clean-microbench clean-insttest
