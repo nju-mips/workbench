@@ -7,11 +7,18 @@ import njumips.configs._
 import njumips.utils._
 import njumips.consts._
 
+class AddrSpace(start:UInt, end:UInt) {
+  val st = start
+  val ed = end
+}
+
 class AXI42SRAM extends Module {
   val io = IO(new Bundle {
     val in = Flipped(new AXI4IO(4, conf.xprlen))
     val out = new MemIO
   })
+  io.in <> DontCare
+  io.out <> DontCare
 }
 
 class MemMux(name:String) extends Module {
