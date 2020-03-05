@@ -156,7 +156,14 @@ void DiffTop::device_io(unsigned char is_aligned, int addr,
   if (!(0 <= addr && addr < 0x08000000)) {
     /* deal with dev_io */
     if (func == MX_RD) {
-      *resp = paddr_peek(addr, len + 1);
+      device_t *dev = ::find_device(addr);
+      if (!dev) {
+        nemu_ptr->dump();
+        eprintf("bad addr 0x%08x received from SOC\n", addr);
+        abort();
+      } else {
+        *resp = paddr_peek(addr, len + 1);
+      }
     } else {
       if (addr == GPIO_TRAP) {
         finished = true;
