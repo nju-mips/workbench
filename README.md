@@ -24,7 +24,8 @@ cd framework
 make run-microbench
 make run-litenes
 make run-coremark
-make run-add # cputests-add
+make run-cputests # run all cputests
+make run-add      # run cputests-add
 ```
 
 ## run insttest and tlbtest
@@ -40,9 +41,15 @@ make run-tlbtest
 
 ## run linux
 ```
+cd nju-mips
+
+git clone git@github.com:nju-mips/rootfs
+make -C rootfs
+
 git clone git@github.com:nju-mips/u-boot
 git clone git@github.com:nju-mips/linux
-ARCH=mips make -C u-boot noop_defconfig
-ARCH=mips make -C linux noop_defconfig
+ARCH=mips make -C u-boot noop_emu_defconfig -j8
+ARCH=mips make -C linux noop_emu_defconfig -j8
+
 cd framework && make run-linux
 ```
