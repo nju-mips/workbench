@@ -12,11 +12,12 @@ compile-u-boot: $(U_BOOT_BIN)
 compile-linux: $(LINUX_BIN)
 compile-u-boot compile-linux:
 	@mkdir -p $(LINUX_OBJDIR)
-	@cd $(LINUX_OBJDIR) && ln -sf $^ .
+	@cd $(LINUX_OBJDIR) && ln -sf $^ . && \
+	  mips-linux-gnu-objdump -d $^ > $(<F).S
 
 run-u-boot: $(EMU_BIN) compile-u-boot
 run-linux: $(EMU_BIN) compile-u-boot compile-linux
-run-nemu-u-boot: $(MIPS32_NEMU) compile-u-boot
+run-nemu-u-boot: $(MIPS32_NEMU) compile-u-boot compile-linux
 run-nemu-linux: $(MIPS32_NEMU) compile-u-boot compile-linux
 
 run-u-boot run-linux:
