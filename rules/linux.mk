@@ -15,19 +15,14 @@ compile-u-boot compile-linux:
 	@cd $(LINUX_OBJDIR) && ln -sf $^ . && \
 	  mips-linux-gnu-objdump -d $^ > $(<F).S
 
-run-u-boot: $(EMU_BIN) compile-u-boot
 run-linux: $(EMU_BIN) compile-u-boot compile-linux
-run-nemu-u-boot: $(MIPS32_NEMU) compile-u-boot compile-linux
-run-nemu-linux: $(MIPS32_NEMU) compile-u-boot compile-linux
-
-run-u-boot run-linux:
 	@mkdir -p $(LINUX_OBJDIR)
 	@cd $(LINUX_OBJDIR) && \
 	  ln -sf $(abspath $(EMU_BIN)) emulator && \
 	  ./emulator -e u-boot \
 	  --block-data ddr:0x4000000:vmlinux 2>npc.out
 
-run-nemu-u-boot run-nemu-linux:
+run-nemu-linux: $(MIPS32_NEMU) compile-u-boot compile-linux
 	@mkdir -p $(LINUX_OBJDIR)
 	@cd $(LINUX_OBJDIR) && \
 	  ln -sf $(MIPS32_NEMU) nemu && \
