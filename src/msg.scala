@@ -19,8 +19,8 @@ class Instr extends Bundle {
 }
 
 class CP0Exception extends Bundle {
-  val offset = UInt(12.W)
-  val code = UInt(ETW_WIDTH.W)
+  val et = UInt(ET_WIDTH.W)
+  val code = UInt(EC_WIDTH.W)
 }
 
 class RegFileIO extends Bundle {
@@ -75,6 +75,7 @@ class CommitIO extends Bundle {
   val pc = Output(UInt(conf.xprlen.W))
   val instr = Output(UInt(conf.xprlen.W))
   val gpr = Output(Vec(32, UInt(conf.xprlen.W)))
+  val ip7 = Output(Bool()) // the time interrupt
 }
 
 class FlushIO extends Bundle {

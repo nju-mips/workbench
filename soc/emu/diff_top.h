@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "emu.h"
-#include "emu__Dpi.h"
+#include "SOC_EMU_TOP.h"
+#include "SOC_EMU_TOP__Dpi.h"
 #include "nemu_api.h"
 
 #define MX_RD 0
@@ -48,14 +48,14 @@ public:
 };
 
 class DiffTop {
-  std::unique_ptr<emu> dut_ptr;
+  std::unique_ptr<SOC_EMU_TOP> dut_ptr;
   std::unique_ptr<NEMU_MIPS32> nemu_ptr;
 
   uint32_t seed;
-  uint64_t cycles, silent_cycles;
+  uint64_t cycles = 0, silent_cycles = 0;
 
-  bool finished;
-  int ret_code;
+  bool finished = false;
+  int ret_code = -1;
   static constexpr uint32_t ddr_size = 128 * 1024 * 1024;
   uint8_t ddr[ddr_size];
 
@@ -65,11 +65,16 @@ class DiffTop {
 
   void check_states();
   uint32_t get_dut_gpr(uint32_t r);
-  static device_t *find_device(const char *name);
   void single_cycle();
   void abort_prologue();
   void cycle_epilogue();
   void reset_ncycles(unsigned n);
+
+  bool can_log_now() const {
+    return cycles >= (80588549 - 1000 - 80);
+    // return cycles >= 537535 - 1000 - 80;
+    // return false;
+  }
 
 public:
   // argv decay to the secondary pointer

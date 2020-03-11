@@ -13,8 +13,8 @@
 #define ESC_CYAN "\x1b[36m"
 #define ESC_RST "\x1b[0m"
 
-// device
-bool is_finished(void);
-int get_exit_code(void);
+#ifndef eprintf
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+#endif
 
 #endif

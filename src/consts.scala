@@ -20,56 +20,47 @@ trait MemConsts {
 }
 
 trait CP0Consts {
-  val AM_EVL = 0x10000020.U // exception vector location
-
-  val EXC_WIDTH = 5
-  // EXC code
-  val EXC_INTR    = 0.U(EXC_WIDTH.W)   // - Interrupt
-  val EXC_Mod     = 1.U(EXC_WIDTH.W)   // * TLB modification
-  val EXC_TLBL    = 2.U(EXC_WIDTH.W)   // * TLB load
-  val EXC_TLBS    = 3.U(EXC_WIDTH.W)   // * TLB store
-  val EXC_AdEL    = 4.U(EXC_WIDTH.W)   // * Address Load
-  val EXC_AdES    = 5.U(EXC_WIDTH.W)   // * Address Store
-  val EXC_IBE     = 6.U(EXC_WIDTH.W)   //   Bus error(IF)
-  val EXC_DBE     = 7.U(EXC_WIDTH.W)   //   Bus error(data)
-  val EXC_SYSCALL = 8.U(EXC_WIDTH.W)   // * Syscall
-  val EXC_BP      = 9.U(EXC_WIDTH.W)   //   Break Point
-  val EXC_RI      = 10.U(EXC_WIDTH.W)  // * Reserved instruction
-  val EXC_CPU     = 11.U(EXC_WIDTH.W)  // * Coprocessor unusable
-  val EXC_OV      = 12.U(EXC_WIDTH.W)  // * Arithmetic overflow
-  val EXC_TRAP    = 13.U(EXC_WIDTH.W)  // * Trap
-
   // exception type
-  val ETW_WIDTH = 32
-  val ET_NONE     =  0x0.U(ETW_WIDTH.W)    // no excepttion
-  val ET_INT      =  0x1.U(ETW_WIDTH.W)    // interruptions
-  val ET_AdEL_IF  =  0x2.U(ETW_WIDTH.W)    // pc[1:0]  != 2'b00, AdEl occurs in if stage 
-  val ET_SYSCALL  =  0x4.U(ETW_WIDTH.W)    // syscall instruction
-  val ET_INVOP    =  0x8.U(ETW_WIDTH.W)    // invalid opcode
-  val ET_OV       =  0x10.U(ETW_WIDTH.W)   // overflow
-  val ET_TRAP     =  0x20.U(ETW_WIDTH.W)   // trap instruction     
-  val ET_BP       =  0x40.U(ETW_WIDTH.W)   // breakpoint
-  val ET_AdEL_LD  =  0x80.U(ETW_WIDTH.W)   // unaligned address when loading
-  val ET_AdES     =  0x100.U(ETW_WIDTH.W)  // unaligned address when storing
-  val ET_eret     =  0x200.U(ETW_WIDTH.W)  // eret
-  val ET_Mod      =  0x400.U(ETW_WIDTH.W)  // TLB modification
-  val ET_TLBL     =  0x800.U(ETW_WIDTH.W)  // TLB load/IF
-  val ET_TLBS     =  0x1000.U(ETW_WIDTH.W) // TLB store
+  val ET_WIDTH = 5
+  val ET_None       =   0.U(ET_WIDTH.W)
+  val ET_EJTAG      =   1.U(ET_WIDTH.W)
+  val ET_RESET      =   2.U(ET_WIDTH.W)
+  val ET_SOFT_RST   =   3.U(ET_WIDTH.W)
+  val ET_NMI        =   4.U(ET_WIDTH.W)
+  val ET_MCheck     =   5.U(ET_WIDTH.W)
+  val ET_ADDR_ERR   =   6.U(ET_WIDTH.W)
+  val ET_TLB_REFILL =   7.U(ET_WIDTH.W)
+  val ET_TLB_Inv    =   8.U(ET_WIDTH.W)
+  val ET_TLB_Mod    =   9.U(ET_WIDTH.W)
+  val ET_CACHE_ERR  =  10.U(ET_WIDTH.W)
+  val ET_BUS_ERR    =  11.U(ET_WIDTH.W)
+  val ET_Ov         =  12.U(ET_WIDTH.W)
+  val ET_Tr         =  13.U(ET_WIDTH.W)
+  val ET_Sys        =  14.U(ET_WIDTH.W)
+  val ET_Bp         =  15.U(ET_WIDTH.W)
+  val ET_RI         =  16.U(ET_WIDTH.W)
+  val ET_CpU        =  17.U(ET_WIDTH.W)
+  val ET_FPE        =  18.U(ET_WIDTH.W)
+  val ET_C3E        =  18.U(ET_WIDTH.W)
+  val ET_WATCH      =  20.U(ET_WIDTH.W)
+  val ET_Int        =  21.U(ET_WIDTH.W)
+  val ET_Eret       =  22.U(ET_WIDTH.W)
 
-  // exception bit
-  val ETB_INT     =  0         // interruptions
-  val ETB_AdEL_IF =  1         // pc[1:0]  != 2'b00, AdEl occurs in if stage 
-  val ETB_SYSCALL =  2         // syscall instruction
-  val ETB_INVOP   =  3         // invalid opcode
-  val ETB_OV      =  4         // overflow
-  val ETB_TRAP    =  5         // trap instruction     
-  val ETB_BP      =  6         // breakpoint
-  val ETB_AdEL_LD =  7         // unaligned address when loading
-  val ETB_AdES    =  8         // unaligned address when storing
-  val ETB_eret    =  9         // eret
-  val ETB_Mod     =  10        // TLB modification
-  val ETB_TLBL    =  11        // TLB load/IF
-  val ETB_TLBS    =  12        // TLB store
+  val EC_WIDTH = 5
+  val EC_Int  =  0.U(EC_WIDTH.W)  // - Interrupt
+  val EC_Mod  =  1.U(EC_WIDTH.W)  // * TLB modification
+  val EC_TLBL =  2.U(EC_WIDTH.W)  // * TLB load
+  val EC_TLBS =  3.U(EC_WIDTH.W)  // * TLB store
+  val EC_AdEL =  4.U(EC_WIDTH.W)  // * Address Load
+  val EC_AdES =  5.U(EC_WIDTH.W)  // * Address Store
+  val EC_IBE  =  6.U(EC_WIDTH.W)  //   Bus error(IF)
+  val EC_DBE  =  7.U(EC_WIDTH.W)  //   Bus error(data)
+  val EC_Sys  =  8.U(EC_WIDTH.W)  // * Syscall
+  val EC_Bp   =  9.U(EC_WIDTH.W)  //   Break Point
+  val EC_RI   = 10.U(EC_WIDTH.W)  // * Reserved instruction
+  val EC_CpU  = 11.U(EC_WIDTH.W)  // * Coprocessor unusable
+  val EC_Ov   = 12.U(EC_WIDTH.W)  // * Arithmetic overflow
+  val EC_Tr   = 13.U(EC_WIDTH.W)  // * Trap
 }
 
 trait InstrConsts {

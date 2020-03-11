@@ -17,6 +17,7 @@ class SimDev extends BlackBox {
 class SOC_EMU_TOP extends Module {
   val io = IO(new Bundle {
     val commit = new CommitIO
+    val can_log_now = Input(Bool())
   })
 
   val core = Module(new Core)

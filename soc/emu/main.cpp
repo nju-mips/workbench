@@ -7,10 +7,11 @@
 #include <iomanip>
 #include <memory>
 #include <string.h>
+#include <syscalls.h>
+#include <sys/syscall.h>
 
 #include "common.h"
-#include "emu_api.h"
-#include "nemu_api.h"
+#include "diff_top.h"
 
 static std::unique_ptr<DiffTop> diff_top;
 
@@ -37,5 +38,6 @@ int main(int argc, const char **argv) {
     eprintf(ESC_RED "HIT BAD TRAP (%d)\n" ESC_RST, ret);
   }
 
+  syscall(__NR_exit, ret);
   return ret;
 }
