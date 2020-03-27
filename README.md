@@ -48,8 +48,10 @@ make -C rootfs
 
 git clone git@github.com:nju-mips/u-boot
 git clone git@github.com:nju-mips/linux
-ARCH=mips make -C u-boot noop_emu_defconfig -j8
-ARCH=mips make -C linux noop_emu_defconfig -j8
+ARCH=mips make -C u-boot noop_emu_defconfig
+ARCH=mips make -C linux noop_emu_defconfig
+ARCH=mips CROSS_COMPILE=mips-linux-gnu- make -C u-boot -j8
+ARCH=mips CROSS_COMPILE=mips-linux-gnu- make -C linux -j8
 
 cd framework && make run-linux
 ```
