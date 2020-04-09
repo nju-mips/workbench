@@ -12,7 +12,13 @@ class Core extends Module {
     val imem = new MemIO
     val dmem = new MemIO
     val commit = new CommitIO
-    val flush = Output(Bool())
+    val icache_control = ValidIO(new CacheControl)
+    val dcache_control = ValidIO(new CacheControl)
+    val multiplier = new MultiplierIO
+    val divider = new DividerIO
+    val ex_flush = Output(Bool())
+    val br_flush = Output(Bool())
+    val can_log_now = Input(Bool())
   })
 
   io.imem.req.valid := N
@@ -23,6 +29,12 @@ class Core extends Module {
   io.dmem.req.bits := 0.U.asTypeOf(io.dmem.req.bits)
   io.dmem.resp.ready := N
 
+  io.icache_control <> DontCare
+  io.dcache_control <> DontCare
+  io.multiplier <> DontCare
+  io.divider <> DontCare
+
   io.commit := 0.U.asTypeOf(io.commit)
-  io.flush := N
+  io.ex_flush := N
+  io.br_flush := N
 }

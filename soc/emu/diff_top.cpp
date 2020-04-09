@@ -104,15 +104,17 @@ void DiffTop::cycle_epilogue() {
   if (silent_cycles >= 200) {
     printf("cycle %lu: no commits in %ld cycles\n", cycles,
         silent_cycles);
+    abort_prologue();
     abort();
   }
 
   if (!dut_ptr->io_commit_valid) { return; }
 
+  ninstr++;
   silent_cycles = 0;
 
   /* launch timer interrupt */
-  if (dut_ptr->io_commit_ip7) { nemu_ptr->set_irq(7, 1); }
+  nemu_ptr->set_irq(7, dut_ptr->io_commit_ip7);
 
   /* nemu executes one cycle */
   nemu_ptr->exec(1);
@@ -130,6 +132,8 @@ void DiffTop::cycle_epilogue() {
     check_states();
 
   last_instr_is_store = false;
+
+  if (can_log_now()) { nemu_ptr->dump_tlb(); }
 }
 
 void DiffTop::single_cycle() {
@@ -172,6 +176,16 @@ void DiffTop::device_io(unsigned char is_aligned, int addr,
       if (addr == GPIO_TRAP) {
         finished = true;
         ret_code = data;
+        printf(
+            "cycles: %ld, ninstr: %ld\n", cycles, ninstr);
+      } else if (addr == ULITE_BASE + ULITE_Tx) {
+#if 0
+        if ((char)data == '[') {
+          uint64_t ms = nemu_ptr->get_ms();
+          printf("%4ld.%06ld: ", ms / 1000000,
+              ms % 1000000);
+        }
+#endif
       }
     }
     return;

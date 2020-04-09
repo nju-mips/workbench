@@ -10,8 +10,9 @@ import njumips.utils._
 class ICache extends Module {
   val io = IO(new Bundle {
     val in = Flipped(new MemIO)
-    val out = new AXI4IO(4, conf.xprlen)
-    val flush = Input(Bool())
+    val out = new AXI4IO(conf.xprlen)
+    val ex_flush = Input(Bool())
+    val br_flush = Input(Bool())
   })
 
   io.in <> DontCare
@@ -21,8 +22,9 @@ class ICache extends Module {
 class DCache extends Module {
   val io = IO(new Bundle {
     val in = Flipped(new MemIO)
-    val out = new AXI4IO(4, conf.xprlen)
-    val flush = Input(Bool())
+    val out = new AXI4IO(conf.xprlen)
+    val ex_flush = Input(Bool())
+    val br_flush = Input(Bool())
   })
 
   io.in <> DontCare

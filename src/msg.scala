@@ -18,6 +18,11 @@ class Instr extends Bundle {
   def addr   = Cat(rs_idx, rt_idx, imm)
 }
 
+class CacheControl extends Bundle {
+  val op = UInt(CACHE_OP_SZ.W)
+  val addr = UInt(32.W)
+}
+
 class CP0Exception extends Bundle {
   val et = UInt(ET_WIDTH.W)
   val code = UInt(EC_WIDTH.W)
@@ -74,8 +79,11 @@ class CommitIO extends Bundle {
   val valid = Output(Bool())
   val pc = Output(UInt(conf.xprlen.W))
   val instr = Output(UInt(conf.xprlen.W))
+  val ip7 = Output(Bool())
   val gpr = Output(Vec(32, UInt(conf.xprlen.W)))
-  val ip7 = Output(Bool()) // the time interrupt
+  val rd_idx = Output(UInt(REG_SZ.W))
+  val wdata = Output(UInt(conf.xprlen.W))
+  val wen = Output(Bool())
 }
 
 class FlushIO extends Bundle {
@@ -97,4 +105,31 @@ class WriteBackIO extends Bundle {
   val rd_idx = Output(UInt(REG_SZ.W))
   val wen = Output(Bool())
   val data = Output(UInt(conf.xprlen.W))
+}
+
+class DividerIO extends Bundle {
+  val data_dividend_valid = Output(Bool())
+  val data_divisor_valid = Output(Bool())
+  val data_dout_valid = Input(Bool())
+  val data_dividend_ready = Input(Bool())
+  val data_divisor_ready = Input(Bool())
+  val data_dividend_bits = Output(UInt(40.W))
+  val data_divisor_bits = Output(UInt(40.W))
+  val data_dout_bits = Input(UInt(80.W))
+}
+
+class MultiplierIO extends Bundle {
+  val data_a = Output(UInt(33.W))
+  val data_b = Output(UInt(33.W))
+  val data_dout = Input(UInt(66.W))
+}
+
+class NSCSCCCommitIO extends Bundle {
+  val ninstr = Output(UInt(32.W))
+  val wb_pc = Output(UInt(conf.xprlen.W))
+  val wb_instr = Output(UInt(conf.xprlen.W))
+  val wb_rf_wdata = Output(UInt(conf.xprlen.W))
+  val wb_rf_wen = Output(Bool())
+  val wb_rf_wnum = Output(UInt(5.W))
+  val wb_valid = Output(Bool())
 }

@@ -13,4 +13,6 @@ object conf {
   val axi_id_width = 4
   val memio_cycles = 2
   val INSTR_ID_SZ = 6
+  val mul_stages = 15
+  val div_stages = 45
 }
