@@ -7,14 +7,22 @@ LOONGSON_OBJDIR := $(abspath $(OBJ_DIR)/loongson)
 LOONGSON_SOFTDIR := $(LOONGSON_OBJDIR)/soft
 LOONGSON_TOP_V := $(OBJ_DIR)/loongson/LoongsonTop.v
 
-U_BOOT_BIN:= $(U_BOOT_HOME)/u-boot.bin
-FUNC_COE  := $(LOONGSON_SOFTDIR)/func/obj/inst_ram.coe
-GAME_COE  := $(LOONGSON_SOFTDIR)/memory_game/obj/axi_ram.coe
-PERF_COE  := $(LOONGSON_SOFTDIR)/perf_func/obj/allbench/axi_ram.coe
+U_BOOT_BIN := $(U_BOOT_HOME)/u-boot.bin
+FUNC_COE   := $(LOONGSON_SOFTDIR)/func/obj/inst_ram.coe
+GAME_COE   := $(LOONGSON_SOFTDIR)/memory_game/obj/axi_ram.coe
+PERF_COE   := $(LOONGSON_SOFTDIR)/perf_func/obj/allbench/axi_ram.coe
 U_BOOT_COE := $(LOONGSON_SOFTDIR)/u-boot/u-boot.coe
 GOLDEN_TRACE := $(LOONGSON_OBJDIR)/cpu132_gettrace/golden_trace.txt
 
 u-boot-coe: $(U_BOOT_COE)
+
+$(FUNC_COE): soc/loongson/soc_axi_func/testbench/inst_ram.coe
+	@mkdir -p $(@D)
+	@cp $< $@
+
+$(GOLDEN_TRACE): soc/loongson/soc_axi_func/testbench/golden_trace.txt
+	@mkdir -p $(@D)
+	@cp $< $@
 
 $(U_BOOT_COE): $(U_BOOT_BIN)
 	@mkdir -p $(@D)
@@ -23,7 +31,7 @@ $(U_BOOT_COE): $(U_BOOT_BIN)
 
 $(LOONGSON_TOP_V): $(SCALA_FILES)
 	@mkdir -p $(@D)
-	@sbt "run LOONGSON_TOP -td $(@D) --output-file $(@F)"
+	@$(SBT) "run LOONGSON_TOP -td $(@D) --output-file $(@F)"
 	@sed -i "s/_\(aw\|ar\|r\|w\|b\)_/_\1/g" $@
 
 clean-loongson:
@@ -52,12 +60,11 @@ loongson-sync-$(1): $$($(1)_LS_TOP_V)
 
 loongson-$(1)-bit: loongson-$(1)-prj
 	@SOC_XPR=mycpu.xpr SOC_DIR=$$(dir $$($(1)_LS_XPR)) \
-	  $(VIVADO_18) $(VIVADO_FLAG) -mode batch \
-	  -source soc/loongson/mk.tcl
+	  $(VIVADO) -mode batch -source soc/loongson/mk.tcl
 
 loongson-$(1)-vivado: loongson-$(1)-prj
 	@cd $$(dir $$($(1)_LS_XPR)) && \
-	  nohup $$(VIVADO_18) $$($(1)_LS_XPR) &
+	  nohup $$(VIVADO) $$($(1)_LS_XPR) &
 
 clean-loongson-$(1):
 	@cd $$(LOONGSON_OBJDIR) && rm -rf soc_axi_$(1)
