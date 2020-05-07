@@ -6,26 +6,33 @@
 #include <getopt.h>
 #include <iomanip>
 #include <memory>
+#include <signal.h>
 #include <string.h>
 #include <sys/syscall.h>
 
 #include "common.h"
 #include "diff_top.h"
+#include "napis.h"
 
 static std::unique_ptr<DiffTop> diff_top;
 
-extern "C" void device_io(unsigned char valid,
-    unsigned char is_aligned, int addr, int len, int data,
-    char func, char wstrb, int *resp) {
+extern "C" void device_io(unsigned char valid, int addr,
+    int len, int data, char func, char wstrb, int *resp) {
   if (!valid) return;
 
-  diff_top->device_io(
-      is_aligned, addr, len, data, func, wstrb, resp);
+  diff_top->device_io(addr, len, data, func, wstrb, resp);
 }
 
 double sc_time_stamp() { return 0; }
 
+void difftop_epilogue(int sig) {
+  napi_dump_states();
+  syscall(__NR_exit, 0);
+}
+
 int main(int argc, const char **argv) {
+  signal(SIGINT, difftop_epilogue);
+
   diff_top.reset(new DiffTop(argc, argv));
   auto ret = diff_top->execute();
 
