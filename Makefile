@@ -1,4 +1,5 @@
-.PHONY: all emu clean-emu clean-am clean-all update minicom
+.PHONY: clean-all minicom
+.SECONDEXPANSION:
 
 export ARCH             := mips32-npc
 export CROSS_COMPILE    := mips-linux-gnu-
@@ -9,23 +10,26 @@ export U_BOOT_HOME      := $(PWD)/../u-boot
 export LINUX_HOME       := $(PWD)/../linux
 export NANOS_HOME       := $(PWD)/../nanos
 
-.DEFAULT_GOAL=emu
+UNCORE     ?= verilator
+UNCORE_DIR := uncore/$(UNCORE)
+VIVADO     := vivado -nolog -nojournal -notrace
+SBT        := sbt -mem 1000
+OBJ_DIR    := output
+ELF2COE    := $(OBJ_DIR)/elf2coe
 
-VIVADO := vivado -nolog -nojournal -notrace
-SBT := sbt -mem 1000
+$(ELF2COE): scripts/elf2coe.cc
+	@g++ $< -o $@
 
-OBJ_DIR := output
+include rules/core.mk
+include rules/nemu.mk
+include rules/testcases.mk
+include $(UNCORE_DIR)/Makefile
 
-clean-am:
-	make -s -C $(AM_HOME) clean
-
-clean-all: clean-emu clean-am
+.DEFAULT_GOAL := project
 
 minicom:
-	cd $(OBJ_DIR) && sudo minicom -D /dev/ttyUSB1 -b 115200 -c on -C cpu.log -S ../minicom.script
+	@cd $(OBJ_DIR) && sudo minicom -D /dev/ttyUSB1 \
+	  -b 115200 -c on -C cpu.log -S ../minicom.script
 
-include rules/emu.mk
-include rules/test.mk
-include rules/linux.mk
-include rules/loongson.mk
-include rules/zedboard.mk
+clean-all:
+	rm -Irf $(OBJ_DIR)

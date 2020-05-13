@@ -5,7 +5,7 @@ rsync -l -r --delete \
   --exclude output \
   --exclude project \
   --exclude README.md \
-  --exclude src \
+  --exclude core \
   --exclude sync \
   --exclude target \
   ../woop/ ./

@@ -12,7 +12,7 @@ $(2)_OBJDIR := $(OBJ_DIR)/$(2)
 endif
 $(2)_DEPS != find $(1) -regex ".*.\(c\|h\|cc\|cpp\|S\)"
 
-.PHONY: compile-$(2) run-$(2) run-nemu-$(2) clean-$(2)
+.PHONY: compile-$(2) clean-$(2)
 
 $$($(2)_APP)-$(ARCH).%: $$($(2)_DEPS)
 	@make -s -C $(1) ARCH=$(ARCH) $(4)
@@ -26,15 +26,14 @@ compile-$(2): $$($(2)_APP)-$(ARCH).elf \
 		rename -f 's/txt$$$$/S/g' *.txt && \
 		rename -f 's/-$(ARCH)//g' * \
 
-run-$(2): $(EMU_BIN) compile-$(2)
-	@cd $$($(2)_OBJDIR) && \
-	  ln -sf $(abspath $(EMU_BIN)) emulator && \
-	  ./emulator -b -e ./$(2).elf 2> npc.out
+$$($(2)_OBJDIR)/bram.coe $$($(2)_OBJDIR)/ddr.coe: \
+  $$($(2)_OBJDIR)/$(2).elf $(ELF2COE)
+	@$(abspath $(ELF2COE)) -e $$< \
+		-s $$($(2)_OBJDIR)/ddr.coe:0x80000000:1048576 \
+		-s $$($(2)_OBJDIR)/bram.coe:0xbfc00000:1048576
 
-run-nemu-$(2): $(MIPS32_NEMU) compile-$(2)
-	@cd $$($(2)_OBJDIR) && \
-	  ln -sf $(MIPS32_NEMU) nemu && \
-	  ./nemu -b -e ./$(2).elf
+$$($(2)_OBJDIR)/trace.txt: $$($(2)_OBJDIR)/$(2).elf
+	@$(MIPS32_NEMU) -b -e $$< -c 2> $$@
 
 clean-$(2):
 	@make -s -C $(1) ARCH=$(ARCH) clean
