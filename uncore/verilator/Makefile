@@ -33,7 +33,7 @@ $(EMU_MK): $(EMU_TOP_V) $(EMU_CXXFILES) $(EMU_LIB_V)
 
 project: $(EMU_BIN)
 
-run-%: project compile-%
+run-%: project $$($$*_ELF)
 	@cd $($*_OBJDIR) && \
 	  ln -sf $(abspath $(EMU_BIN)) emulator && \
 	  ./emulator -b -e ./$*.elf 2> npc.out
@@ -45,4 +45,4 @@ update: $(EMU_MK)
 	@touch $<
 
 clean:
-	rm -Irf $(OBJ_DIR)/$(UNCORE)
+	rm -rI $(OBJ_DIR)/$(UNCORE)

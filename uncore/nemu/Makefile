@@ -1,8 +1,8 @@
 .PHONY: run-% prj
 
-run-%: $(MIPS32_NEMU) compile-%
+run-%: $(MIPS32_NEMU) $$($$*_ELF)
 	@cd $($*_OBJDIR) && $< -b -e ./$*.elf
 
-prj: $(MIPS32_NEMU)
+project: $(MIPS32_NEMU)
 update: ;
 clean: ;

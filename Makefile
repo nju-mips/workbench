@@ -1,4 +1,6 @@
 .PHONY: clean-all minicom
+
+.SUFFIXES:
 .SECONDEXPANSION:
 
 export ARCH             := mips32-npc
@@ -29,7 +31,8 @@ include $(UNCORE_DIR)/Makefile
 
 minicom:
 	@cd $(OBJ_DIR) && sudo minicom -D /dev/ttyUSB1 \
-	  -b 115200 -c on -C cpu.log -S ../minicom.script
+	  -b 115200 -c on -C serial.log \
+	  -S $(PWD)/scripts/minicom.script
 
 clean-all:
-	rm -Irf $(OBJ_DIR)
+	rm -rI $(OBJ_DIR)
