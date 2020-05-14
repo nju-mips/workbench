@@ -3,6 +3,7 @@ package core
 
 import chisel3._
 import chisel3.util._
+import njumips.consts._
 import njumips.configs._
 import njumips.utils._
 
@@ -15,7 +16,7 @@ class HandShakeIO extends Bundle {
 
 abstract class AXI4ChannelA extends HandShakeIO
 {
-  val id = Output(UInt(4.W))
+  val id = Output(UInt(conf.axi_id_width.W))
   val addr = Output(UInt(32.W))
   val len = Output(UInt(8.W))
   val size = Output(UInt(3.W))
@@ -38,7 +39,7 @@ class AXI4ChannelAR extends AXI4ChannelA
 
 class AXI4ChannelW(data_width: Int) extends HandShakeIO
 {
-  val id = Output(UInt(4.W))
+  val id = Output(UInt(conf.axi_id_width.W))
   val data = Output(UInt(data_width.W))
   val strb = Output(UInt((data_width / 8).W))
   val last = Output(Bool())
@@ -49,7 +50,7 @@ class AXI4ChannelW(data_width: Int) extends HandShakeIO
 
 class AXI4ChannelB extends HandShakeIO
 {
-  val id = Output(UInt(4.W))
+  val id = Output(UInt(conf.axi_id_width.W))
   val resp = Output(UInt(2.W))
   val user = Output(UInt(5.W))
 }
@@ -57,7 +58,7 @@ class AXI4ChannelB extends HandShakeIO
 // read data channel signals
 class AXI4ChannelR(data_width: Int) extends HandShakeIO
 {
-  val id = Output(UInt(4.W))
+  val id = Output(UInt(conf.axi_id_width.W))
   val data = Output(UInt(data_width.W))
   val resp = Output(UInt(2.W))
   val last = Output(Bool())

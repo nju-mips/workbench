@@ -155,22 +155,15 @@ class loongson_top extends Module {
   val core = Module(new Core)
   val imem2axi = Module(new MemIO2AXI(conf.xprlen))
   val dmem2axi = Module(new MemIO2AXI(conf.xprlen))
-  val icache = Module(new SimICache)
 
   core.io.can_log_now := N
-  icache.io.can_log_now := N
 
-  core.io.imem <> icache.io.in
-  icache.io.out <> imem2axi.io.in
+  core.io.imem <> imem2axi.io.in
   core.io.dmem <> dmem2axi.io.in
   core.io.divider <> io.divider
   core.io.multiplier <> io.multiplier
   imem2axi.io.out <> io.imem
   dmem2axi.io.out <> io.dmem
-
-  icache.io.control <> core.io.icache_control
-  icache.io.ex_flush := core.io.ex_flush
-  icache.io.br_flush := core.io.br_flush
 
   io.commit <> core.io.commit
 }

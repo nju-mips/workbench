@@ -28,11 +28,20 @@ class MemIO2AXI(dw:Int) extends Module {
     val out = new AXI4IO(dw)
   })
 
-  io.out.aw.valid := io.in.req.valid && io.in.req.bits.func === MX_WR
-  io.out.aw.addr := io.in.req.bits.addr
+  val is_req_wr = io.in.req.valid && io.in.req.bits.func === MX_WR
+  val aw_fire = RegInit(N)
+  val w_fire = RegInit(N)
+  val addr = io.in.req.bits.addr
+  val alen = Mux1H(Array(
+    (io.in.req.bits.len === ML_1) -> "b00".U,
+    (io.in.req.bits.len === ML_2) -> "b01".U,
+    (io.in.req.bits.len === ML_4) -> "b10".U))
+
+  io.out.aw.valid := is_req_wr && !aw_fire
+  io.out.aw.addr := addr
   io.out.aw.id := 0.U
   io.out.aw.len := 0.U
-  io.out.aw.size := "b10".U
+  io.out.aw.size := alen
   io.out.aw.burst := 0.U
   io.out.aw.lock := 0.U
   io.out.aw.cache := 0.U
@@ -40,19 +49,34 @@ class MemIO2AXI(dw:Int) extends Module {
   io.out.aw.region := 0.U
   io.out.aw.qos := 0.U
   io.out.aw.user := 0.U
+  when (is_req_wr && io.out.aw.fire() && !io.out.w.fire()) {
+    aw_fire := Y
+  }
 
-  io.out.w.valid := io.in.req.valid && io.in.req.bits.func === MX_WR
+  io.out.w.valid := is_req_wr && !w_fire
   io.out.w.id := 0.U
   io.out.w.data := io.in.req.bits.data
   io.out.w.strb := io.in.req.bits.strb
   io.out.w.last := Y
   io.out.w.user := 0.U
+  when (is_req_wr && !io.out.aw.fire() && io.out.w.fire()) {
+    w_fire := Y
+  }
+
+  val req_w_ready = (io.out.aw.ready && w_fire) ||
+    (aw_fire && io.out.w.ready) ||
+    (io.out.aw.ready && io.out.w.ready)
+
+  when (io.in.req.fire()) {
+    aw_fire := N
+    w_fire := N
+  }
 
   io.out.ar.valid := io.in.req.valid && io.in.req.bits.func === MX_RD
-  io.out.ar.addr := io.in.req.bits.addr
+  io.out.ar.addr := addr
   io.out.ar.id := 0.U
   io.out.ar.len := 0.U
-  io.out.ar.size := "b10".U
+  io.out.ar.size := alen
   io.out.ar.burst := 0.U
   io.out.ar.lock := 0.U
   io.out.ar.cache := 0.U
@@ -64,8 +88,8 @@ class MemIO2AXI(dw:Int) extends Module {
   io.out.r.ready := io.in.resp.ready
   io.out.b.ready := io.in.resp.ready
 
-  io.in.req.ready := io.out.w.ready && io.out.aw.ready &&
-    io.out.ar.ready
+  io.in.req.ready := Mux(io.in.req.bits.func === MX_WR,
+    req_w_ready, io.out.ar.ready)
   io.in.resp.valid := io.out.r.valid || io.out.b.valid
   io.in.resp.bits.data := io.out.r.data
 }
