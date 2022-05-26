@@ -1,10 +1,10 @@
-package woop
+package njumips
 package core
 
 import chisel3._
 import chisel3.util._
-import woop.consts._
-import woop.configs._
+import njumips.consts._
+import njumips.configs._
 
 class CP0Status extends Bundle {
   val CU   = UInt(4.W)

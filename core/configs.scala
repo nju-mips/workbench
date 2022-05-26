@@ -16,4 +16,20 @@ object conf {
   val mul_stages = 7
   val div_stages = 45
   val random_delay = false
+
+  val TLB_BITS = 5
+  val TLBSZ = (1 << TLB_BITS)
+  val PABITS = 32
+
+  val nICacheSets = 256
+  val nICacheWaysPerSet = 4
+  val nICacheWordsPerWay = 16
+  val nDCacheSets = 256
+  val nDCacheWays = 4
+  val nDCacheWayBytes = 16
+
+  val AXI4_DATA_WIDTH = 32
+  val AXI4_ID_WIDTH = 3
+  val AXI4_BURST_LENGTH = 32
+  val AXI4_BURST_BYTES = AXI4_DATA_WIDTH / 8
 }
