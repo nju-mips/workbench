@@ -98,7 +98,7 @@ DiffTop::DiffTop(int argc, const char *argv[]) {
 
   /* srand */
   uint32_t seed = (unsigned)time(NULL) ^ (unsigned)getpid();
-  ;
+
   srand(seed);
   srand48(seed);
   Verilated::randReset(seed);
